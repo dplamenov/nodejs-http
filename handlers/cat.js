@@ -5,7 +5,6 @@ const qs = require('querystring');
 const formidable = require('formidable');
 const breeds = require('../data/breeds');
 const cats = require('../data/cats');
-const expressResponse = require('../express');
 
 module.exports = (req, res) => {
     const pathname = url.parse(req.url).pathname;
@@ -90,6 +89,35 @@ module.exports = (req, res) => {
                 });
 
             });
+        });
+    } else if (pathname.includes('/cats/edit') && req.method === 'GET') {
+
+        fs.readFile('./views/editCat.html', 'utf-8', (err, data) => {
+            if (err) {
+                console.error(err);
+            }
+
+            const currentCat = cats.find(e => e.id == qs.parse(url.parse(req.url).query).catId);
+
+            Object.entries(currentCat).forEach(([k, v]) => {
+                data = data.replace(`{{${k}}}`, v);
+            });
+
+            const catBreeds = breeds.map(e => {
+                if (e === currentCat.breed) {
+                    return `<option value="${e}" selected>${e}</option>`;
+                }
+                return `<option value="${e}">${e}</option>`;
+            });
+
+            data = data.replace('{{catBreeds}}', catBreeds);
+
+            res.writeHead(200, {
+                'Content-type': 'text/html'
+            });
+
+            res.write(data);
+            res.end();
         });
     } else {
         return true;
