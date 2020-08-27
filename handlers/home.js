@@ -32,11 +32,10 @@ module.exports = (req, res) => {
                     <p><span>Description: </span>${c.description}</p>
                     <ul class="buttons">
                         <li class="btn edit"><a href="/cats/edit?catId=${c.id}">Change Info</a></li>
-                        <li class="btn delete"><a href="">New Home</a></li>
+                        <li class="btn delete"><a href="/cats/shelter?catId=${c.id}">New Home</a></li>
                     </ul>
                 </li>`;
                 });
-                console.log(catsElements);
                 res.write(data.replace('{{cats}}', catsElements.join('')));
                 res.end();
             });

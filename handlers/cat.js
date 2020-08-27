@@ -151,6 +151,19 @@ module.exports = (req, res) => {
                 });
             });
         });
+    } else if (pathname.includes('/cats/shelter') && req.method === 'GET') {
+        const catId = qs.parse(url.parse(req.url).query).catId;
+        const currentCat = cats.find(e => e.id == catId);
+
+        fs.readFile('./views/catShelter.html', 'utf-8', (err, data) => {
+
+            Object.entries(currentCat).forEach(([k, v]) => {
+                data = data.replace(`{{${k}}}`, v);
+            });
+
+            res.write(data);
+            res.end();
+        });
     } else {
         return true;
     }
