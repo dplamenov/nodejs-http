@@ -164,6 +164,17 @@ module.exports = (req, res) => {
             res.write(data);
             res.end();
         });
+    } else if (pathname.includes('/cats/shelter') && req.method === 'POST') {
+        const catId = qs.parse(url.parse(req.url).query).catId;
+
+        const catsArray = cats.filter(cat => cat.id !== catId);
+
+        fs.writeFile('./data/cats.json', JSON.stringify(catsArray), 'utf-8', (err, data) => {
+            res.writeHead(302, {
+                'Location': '/'
+            });
+            res.end();
+        });
     } else {
         return true;
     }
