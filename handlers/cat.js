@@ -119,6 +119,38 @@ module.exports = (req, res) => {
             res.write(data);
             res.end();
         });
+    } else if (pathname.includes('/cats/edit') && req.method === 'POST') {
+        const form = new formidable.IncomingForm();
+        form.parse(req, (err, fields, files) => {
+            if (err) {
+                console.error(err);
+            }
+
+            const oldpath = files.upload.path;
+            const newpath = path.resolve('content', 'images', files.upload.name);
+
+            fs.rename(oldpath, newpath, function () {
+                const currentCatId = qs.parse(url.parse(req.url).query).catId;
+                const currentCatIndex = cats.findIndex(e => e.id == currentCatId);
+                const newCatsArray = cats.map((cat, index) => {
+                    if (index === currentCatIndex) {
+                        return Object.assign({}, fields, { image: files.upload.name, id: currentCatId });
+                    }
+                    return cat;
+                });
+
+                fs.writeFile('./data/cats.json', JSON.stringify(newCatsArray), 'utf-8', (err) => {
+                    if (err) {
+                        console.error(err);
+                    }
+
+                    res.writeHead(302, {
+                        'Location': '/'
+                    });
+                    res.end();
+                });
+            });
+        });
     } else {
         return true;
     }
