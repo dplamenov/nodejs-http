@@ -1,7 +1,7 @@
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
-
+const qs = require('querystring');
 
 module.exports = (req, res) => {
     const pathname = url.parse(req.url).pathname;
@@ -23,7 +23,12 @@ module.exports = (req, res) => {
                     console.error(err);
                 }
 
-                const cats = JSON.parse(catsData);
+                let cats = JSON.parse(catsData);
+
+                const query = qs.parse(url.parse(req.url).query).query;
+                if (query) {
+                    cats = cats.filter(e => e.name.includes(query) || e.description.includes(query));
+                }
                 const catsElements = cats.map(c => {
                     return `<li>
                     <img src="content/images/${c.image}" alt="${c.name}">
